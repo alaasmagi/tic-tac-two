@@ -1,4 +1,4 @@
-# Tic-Tac-Two - an enhanced version of popular tic-tac-two game
+# Tic-Tac-Two - an enhanced version of popular tic-tac-two game (still under active development)
 
 ## Description
 
@@ -25,108 +25,149 @@ The software has two UIs:
 *  **ConsoleApp**: Old-fashioned looking UI that supports one PC (you can still play 1v1).
 *  **WebApp(Razor pages)**:  Modern looking web interface that supports multiple users from other PCs.
 
+### Backend structure
+The software has 8 different parts:  
+* **Authentication**: As the name says, this part is responsible for authentication in the WebApp UI.
+* **ConsoleApp**: This part controls the gameflow in the Console UI.
+* **ConsoleUI**: This part is responsible for drawing the board in Console UI.
+* **DAL**: Data Access Layer communicates with database or with file system (there is an interface and it can be easily changed between file system and db)
+* **Domain**: It contains all of the entities and enums.
+* **GameBrain**: This part controls the game flow in general regardless of the UI that is used.
+* **MenuSystem**: It controls all of the Console UI's menu elements.
+* **WebApp**: This is the second interface for the web users.
+
 ### Data Transfer Objects (DTOs) and DB Entities
 DTOs are used for communicating with Power Automate (via HTTP) and SQLite database
 
-* **Request:**
+* **GameConfig:**
 
 ```csharp
-public class Request
+public class GameConfig
 {
-    public DateTime requestTimestamp { get; set; }
-    public string? bookingId { get; set; }
-    public DateTime bookingStart { get; set; }
-    public DateTime bookingEnd { get; set; }
-    public string? plcValue { get; set; }
-    public string? requestBody { get; set; }
-}
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public int GamePiecesPerPlayer { get; set; } = 4;
+    public int BoardWidth { get; set; } = 5;
+    public int BoardHeight { get; set; } = 5;
+    public int GridSizeAndWinCondition { get; set; } = 3;
+    public int GridStartPosX { get; set; } = 0;
+    public int GridStartPosY { get; set; } = 0;
+    public int RelocatePiecesAfterMoves { get; set; } = 4;
+
+    public string ToJsonString()
+    {
+        return System.Text.Json.JsonSerializer.Serialize(this);
+    }
+}   
 ```
   
-* **RuleEntry:**
+* **GameState:**
 
 ```csharp
-public class RuleEntry
-{
-    public string DayOfWeek { get; set; }
-    public string StartTime { get; set; }
-    public string EndTime { get; set; }
-    public string PlcIds { get; set; }
+public class GameState
+{ 
+    public int Id { get; set; }
+    public EGamePiece [][] GameBoard { get; set; }
+    public EGamePiece NextMoveBy { get; set; } = EGamePiece.O;
+    public EGameGrid [][] GameGrid { get; set; }
+    public EGameStatus CurrentStatus { get; set; }
+    public GameConfig GameConfiguration { get; set; }
+    public int XPiecesCount { get; set; }
+    public int OPiecesCount { get; set; }
 
-    public RuleEntry(string dayOfWeek, string startTime, string endTime, string plcIds)
+    public GameState(EGamePiece[][] gameBoard, EGameGrid[][] gameGrid, GameConfig gameConfiguration, EGameStatus currentStatus, int xPiecesCount, int oPiecesCount)
     {
-        DayOfWeek = dayOfWeek;
-        StartTime = startTime;
-        EndTime = endTime;
-        PlcIds = plcIds;
+        GameBoard = gameBoard;
+        GameGrid = gameGrid;
+        GameConfiguration = gameConfiguration;
+        CurrentStatus = currentStatus;
+        XPiecesCount = xPiecesCount;
+        OPiecesCount = oPiecesCount;
+    }
+
+    public string ToJsonString()
+    {
+        return System.Text.Json.JsonSerializer.Serialize(this);
     }
 }
 ```
 
+* **Database entities:**
+
+```csharp
+public class ConfigurationEntity
+{
+    public int Id { get; set; }
+    public string GameConfigName { get; set; } = "";
+    public string SerializedJsonString { get; set; } = "";
+}
+
+public class SaveGameEntity
+{
+    public int Id { get; set; }
+    public string SaveGameName { get; set; } = "";
+    public int PlayerAId { get; set; }
+    public int PlayerBId { get; set; }
+    public string SerializedJsonString { get; set; } = "";
+}
+
+public class UserEntity
+{
+    public int Id { get; set; }
+    public string UserName { get; set; } = "";
+    public string PassHash { get; set; } = "";
+}
+```
+
+* **Enums:**
+
+```csharp
+public enum EGameStatus
+{
+    XWins,
+    OWins,
+    Tie,
+    UnFinished
+}
+```
+
+```csharp
+public enum EGamePiece //it is actually int
+{
+    Empty, //0
+    X, // 1
+    O, // 2
+}
+```
+
+```csharp
+public enum EGameMode
+{
+    PlayerVsAi,
+    PlayerVsPlayer,
+    AiVsAi
+}
+```
+
+```csharp
+public enum EGameGrid
+{
+    Empty,
+    Grid
+}
+```
+
 ### Data management
-The application uses SQLite database and it stores data locally.
+The application uses two different approaches:  
+* File system approach
+* Database approach
 
-Data is separated between 2 tables. Each table has its own use.
-
-* **UL_PLC_DICTIONARY** - stores all PLC data:
-
-```sql
-CREATE TABLE "UL_PLC_DICTIONARY" (
-	"plc_id"	INTEGER NOT NULL UNIQUE,
-	"plc_value"	TEXT NOT NULL UNIQUE,
-	"plc_name"	TEXT NOT NULL UNIQUE,
-	"class_PC_ip"	TEXT,
-	PRIMARY KEY("plc_id")
-);
-```
-  
-* **UL_PLC_BOOKINGS** - stores all bookings:
-
-```sql
-CREATE TABLE "UL_PLC_BOOKINGS" (
-	"plc_id"	INTEGER NOT NULL,
-	"booking_id"	TEXT NOT NULL UNIQUE,
-	"start"	INTEGER NOT NULL,
-	"end"	INTEGER NOT NULL,
-	PRIMARY KEY("booking_id")
-);
-```
-
-### Rule entry
-The interface enables teachers/lecturers to book all (or some of) the PLCs for specific timeslots in repeated pattern (ig. timetable). The feature was requested by our supervisor, because it made him easy to book all PLCs for lectures or lab works.
-
-The interface uses rules to implement this feature. Rules are in rules.txt file and are in format:  
-`!day of week(abbreviation);HH:mm(start);HH:mm(end);<all PLCs to apply the rule to>`.
-
-## Testing and Debugging
-* **Frontend Testing:** Open index.html or tv-view.html in a browser to validate the UI functionality.
-* **Backend Testing:** Use tools like Postman to send HTTP requests to the API endpoints and verify responses.
-* **Database Debugging:** Open the SQLite database file (plc_booking.db) using tools like DB Browser for SQLite to check stored data manually.
-
-## Developer Guide
-
-### Adding New API Endpoints
-* Create a new method in the APIController class to handle the endpoint.
-* Add corresponding business logic in the BusinessLogic class.
-* Update the SQLite database schema if required and document the changes.
-
-### Adding New Frontend Features
-* Modify index.html or tv-view.html and link to new JavaScript or CSS files as needed.
-* Use the existing backend endpoints or create new ones for dynamic data fetching.
-
-## Known Limitations
-* No support for recurring bookings directly through the interface's own UI.
-* Application is not optimized for heavy concurrent user loads (as it currently serves purpose in only one classroom).
+In both approaches, configuration and gamestate data is stored as serialized JSON string. Data management has an interface and both file system and database approach implement it. So the method can be changed with by changing just the few lines of code.
 
 ## Scaling possibilities
 
-### TV UI Experience Enhancements
-* Add features like booking reminders or display additional details about bookings.
-
-### API Enhancements
-* Enable the API to send notifications to users if they attempt to use an already occupied PLC without making a reservation.
-
 ### Mobile Application
-* Create a dedicated iOS/Android application containing the same UIs, while the backend runs on a separate server.
+* Create a dedicated iOS/Android application containing the web Ui, while the backend runs on a separate server.
 
 ### Cloud Integration
 * Host the backend on platforms like AWS, Azure, or GCP for scalability and reliability.
