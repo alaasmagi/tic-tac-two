@@ -1,0 +1,49 @@
+@page
+@model WebApp.Pages_Savegames.CreateModel
+
+        @{
+        ViewData["Title"] = "Create";
+        }
+        
+        <h1>Create</h1>
+        
+    <h4>SaveGameEntity</h4>
+    <hr />
+    <div class="row">
+    <div class="col-md-4">
+    <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="SaveGameEntity.SaveGameName" class="control-label"></label>
+                <input asp-for="SaveGameEntity.SaveGameName" class="form-control" />
+                <span asp-validation-for="SaveGameEntity.SaveGameName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SaveGameEntity.PlayerAId" class="control-label"></label>
+                <input asp-for="SaveGameEntity.PlayerAId" class="form-control" />
+                <span asp-validation-for="SaveGameEntity.PlayerAId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SaveGameEntity.PlayerBId" class="control-label"></label>
+                <input asp-for="SaveGameEntity.PlayerBId" class="form-control" />
+                <span asp-validation-for="SaveGameEntity.PlayerBId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SaveGameEntity.SerializedJsonString" class="control-label"></label>
+                <input asp-for="SaveGameEntity.SerializedJsonString" class="form-control" />
+                <span asp-validation-for="SaveGameEntity.SerializedJsonString" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

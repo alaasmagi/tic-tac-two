@@ -1,0 +1,13 @@
+namespace DAL;
+
+public static class FileHelper
+{
+    public static string BasePath = Environment
+                                        .GetFolderPath(System.Environment.SpecialFolder.UserProfile)
+                                    + Path.DirectorySeparatorChar + "tic-tac-two" + Path.DirectorySeparatorChar;
+    
+    public static string ConfigExtension = ".config.json";
+    public static string GameExtension = ".game.json";
+    public static string DbConfigExtension = ".config.db";
+    public static string DbGameExtension = ".game.db";
+}
