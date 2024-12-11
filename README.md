@@ -106,16 +106,10 @@ public class SaveGameEntity
 {
     public int Id { get; set; }
     public string SaveGameName { get; set; } = "";
-    public int PlayerAId { get; set; }
-    public int PlayerBId { get; set; }
+    public string PlayerAName { get; set; } = "";
+    public string PlayerBName { get; set; } = "";
+    public EGameMode GameMode { get; set; }
     public string SerializedJsonString { get; set; } = "";
-}
-
-public class UserEntity
-{
-    public int Id { get; set; }
-    public string UserName { get; set; } = "";
-    public string PassHash { get; set; } = "";
 }
 ```
 
@@ -132,11 +126,11 @@ public enum EGameStatus
 ```
 
 ```csharp
-public enum EGamePiece //it is actually int
+public enum EGamePiece
 {
-    Empty, //0
-    X, // 1
-    O, // 2
+    Empty,
+    X,
+    O,
 }
 ```
 
