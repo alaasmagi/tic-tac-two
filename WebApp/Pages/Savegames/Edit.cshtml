@@ -1,5 +1,5 @@
 @page
-@model WebApp.Pages_Savegames.EditModel
+@model WebApp.Pages_SaveGames.EditModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -22,15 +22,21 @@
             </div>
             <div class="form-group">
                 
-                <label asp-for="SaveGameEntity.PlayerAId" class="control-label"></label>
-                <input asp-for="SaveGameEntity.PlayerAId" class="form-control" />
-                <span asp-validation-for="SaveGameEntity.PlayerAId" class="text-danger"></span>
+                <label asp-for="SaveGameEntity.PlayerAName" class="control-label"></label>
+                <input asp-for="SaveGameEntity.PlayerAName" class="form-control" />
+                <span asp-validation-for="SaveGameEntity.PlayerAName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 
-                <label asp-for="SaveGameEntity.PlayerBId" class="control-label"></label>
-                <input asp-for="SaveGameEntity.PlayerBId" class="form-control" />
-                <span asp-validation-for="SaveGameEntity.PlayerBId" class="text-danger"></span>
+                <label asp-for="SaveGameEntity.PlayerBName" class="control-label"></label>
+                <input asp-for="SaveGameEntity.PlayerBName" class="form-control" />
+                <span asp-validation-for="SaveGameEntity.PlayerBName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="SaveGameEntity.GameMode" class="control-label"></label>
+                <select asp-for="SaveGameEntity.GameMode" class="form-control"></select>
+                <span asp-validation-for="SaveGameEntity.GameMode" class="text-danger"></span>
             </div>
             <div class="form-group">
                 

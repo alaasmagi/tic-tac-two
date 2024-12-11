@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DAL;
 using Domain;
 
-namespace WebApp.Pages_Savegames
+namespace WebApp.Pages_SaveGames
 {
     public class CreateModel : PageModel
     {

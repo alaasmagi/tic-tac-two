@@ -1,5 +1,5 @@
 @page
-@model WebApp.Pages_Savegames.IndexModel
+@model WebApp.Pages_SaveGames.IndexModel
 
 @{
     ViewData["Title"] = "Index";
@@ -17,10 +17,13 @@
                 @Html.DisplayNameFor(model => model.SaveGameEntity[0].SaveGameName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SaveGameEntity[0].PlayerAId)
+                @Html.DisplayNameFor(model => model.SaveGameEntity[0].PlayerAName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SaveGameEntity[0].PlayerBId)
+                @Html.DisplayNameFor(model => model.SaveGameEntity[0].PlayerBName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SaveGameEntity[0].GameMode)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.SaveGameEntity[0].SerializedJsonString)
@@ -35,10 +38,13 @@
                 @Html.DisplayFor(modelItem => item.SaveGameName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PlayerAId)
+                @Html.DisplayFor(modelItem => item.PlayerAName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PlayerBId)
+                @Html.DisplayFor(modelItem => item.PlayerBName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GameMode)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SerializedJsonString)

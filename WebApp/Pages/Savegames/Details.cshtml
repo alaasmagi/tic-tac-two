@@ -1,5 +1,5 @@
 @page
-@model WebApp.Pages_Savegames.DetailsModel
+@model WebApp.Pages_SaveGames.DetailsModel
 
 @{
     ViewData["Title"] = "Details";
@@ -18,16 +18,22 @@
             @Html.DisplayFor(model => model.SaveGameEntity.SaveGameName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SaveGameEntity.PlayerAId)
+            @Html.DisplayNameFor(model => model.SaveGameEntity.PlayerAName)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SaveGameEntity.PlayerAId)
+            @Html.DisplayFor(model => model.SaveGameEntity.PlayerAName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SaveGameEntity.PlayerBId)
+            @Html.DisplayNameFor(model => model.SaveGameEntity.PlayerBName)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SaveGameEntity.PlayerBId)
+            @Html.DisplayFor(model => model.SaveGameEntity.PlayerBName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SaveGameEntity.GameMode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SaveGameEntity.GameMode)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.SaveGameEntity.SerializedJsonString)

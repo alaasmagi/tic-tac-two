@@ -1,4 +1,3 @@
-using GameBrain;
 using System.Text.RegularExpressions;
 using Domain;
 
@@ -6,7 +5,7 @@ namespace DAL;
 
 public class GameRepositoryJson : IGameRepository
 {
-    public List<string> GetSaveGameNames()
+    public List<string> GetSaveGameNames(string playerName)
     {
         return Directory
             .GetFiles(FileHelper.BasePath, "*" + FileHelper.GameExtension)
@@ -17,35 +16,34 @@ public class GameRepositoryJson : IGameRepository
             )
             .ToList();
     }
-    public void SaveGame(string jsonStateString, string gameConfigName)
+    public void SaveGame(string jsonStateString, string gameConfigName, string playerA, string playerB, EGameMode gameMode)
     {
-        var fileName = FileHelper.BasePath + 
-                       gameConfigName + " " + 
-                       DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss.fffffffzzz").Replace(":", "") + 
+        var fileName = FileHelper.BasePath + $"{playerA}_{playerB}_{gameMode}_{gameConfigName}_" +
+                       DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss").Replace(":", "") +
                        FileHelper.GameExtension;
         
-        System.IO.File.WriteAllText(fileName, jsonStateString);
+        File.WriteAllText(fileName, jsonStateString);
     }
 
-    public GameState LoadGame(string name)
+    public void LoadGame(string name, out GameState loadedGame, out string playerA, out string playerB, out EGameMode gameMode)
     {
-        var saveGameJsonString = System.IO.File.ReadAllText(FileHelper.BasePath + name + FileHelper.GameExtension);
-        GameState loadedGame = System.Text.Json.JsonSerializer.Deserialize<GameState>(saveGameJsonString)!;
-        
-        return loadedGame!;
-    }
-
-    public string GetSaveConfigName(string gameName)
-    {
-        string pattern = @"(.*?) \d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.\d{7}\+\d{4}";
-        
-        var match = Regex.Match(gameName, pattern);
+        string pattern = @"^(?<playerA>[^_]+)_(?<playerB>[^_]+)_(?<gameMode>[^_]+)_.+";
+        var match = Regex.Match(name, pattern);
 
         if (!match.Success)
         {
             throw new ArgumentException("Invalid game filename");
         }
+
+        playerA = match.Groups["playerA"].Value;
+        playerB = match.Groups["playerB"].Value;
+
+        if (!Enum.TryParse(match.Groups["gameMode"].Value, out gameMode))
+        {
+            throw new ArgumentException("Invalid game mode in filename");
+        }
         
-        return match.Groups[1].Value;
+        var saveGameJsonString = File.ReadAllText(FileHelper.BasePath + name + FileHelper.GameExtension);
+        loadedGame = System.Text.Json.JsonSerializer.Deserialize<GameState>(saveGameJsonString)!;
     }
 }

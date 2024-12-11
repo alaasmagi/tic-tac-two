@@ -59,17 +59,14 @@ public class Menu
         {
             MenuItems.Add(_menuItemReturnMain);
         }
-
+        
+        
         MenuItems.Add(_menuItemExit);
-        
-        
-        // TODO: validate menu items for shortcut conflict!
     }
 
     public string Run()
     {
         
-        Console.Clear();
         do
         {
             var menuItem = DisplayMenuGetUserChoice();

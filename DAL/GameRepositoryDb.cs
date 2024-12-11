@@ -3,56 +3,39 @@ using System.Text.RegularExpressions;
 
 namespace DAL;
 
-public class GameRepositoryDb:IGameRepository
+public class GameRepositoryDb(AppDbContext context) : IGameRepository
 {
-    private readonly AppDbContext _context;
-    public GameRepositoryDb()
+    public void SaveGame(string jsonStateString, string gameConfigName, string playerA, string playerB, EGameMode gameMode)
     {
-        var contextFactory = new AppDbContextFactory();
-        _context = contextFactory.CreateDbContext([]);
-    }
-    
-    public void SaveGame(string jsonStateString, string gameConfigName)
-    {
+        
         var saveGame = new SaveGameEntity
         {
-            SaveGameName =  gameConfigName + " " + 
-                            DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss.fffffffzzz").Replace(":", ""),
+            SaveGameName =  $"{playerA}_{playerB}_{gameMode}_{gameConfigName}_" +
+                            DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss").Replace(":", ""),
+            PlayerAName = playerA,
+            PlayerBName = playerB,
             SerializedJsonString = jsonStateString
         };
-
-        _context.SaveGames.Add(saveGame);
-        _context.SaveChanges();
+        
+        context.SaveGames.Add(saveGame);
+        context.SaveChanges();
     }
 
-    public List<string> GetSaveGameNames()
+    public List<string> GetSaveGameNames(string playerName)
     {
-        return _context.SaveGames.Select(s => s.SaveGameName.ToString()).ToList();
+        return context.SaveGames
+            .Where(s => s.PlayerAName == playerName || s.PlayerBName == playerName)
+            .Select(s => s.SaveGameName.ToString())
+            .ToList();
     }
 
-    public GameState LoadGame(string name)
+    public void LoadGame(string name, out GameState loadedGame, out string playerA, out string playerB, out EGameMode gameMode)
     {
-        var saveGame = _context.SaveGames
+        var saveGame = context.SaveGames
             .FirstOrDefault(s => s.SaveGameName == name);
-        
-        GameState loadedGame = System.Text.Json.JsonSerializer.Deserialize<GameState>(saveGame!.SerializedJsonString)!;
-
-        return loadedGame;
-    }
-
-    public string GetSaveConfigName(string gameName)
-    {
-        var saveGame = _context.SaveGames
-            .FirstOrDefault(s => s.SaveGameName == gameName);
-        
-        string pattern = @"(.*?) \d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.\d{7}\+\d{4}";
-        
-        var match = Regex.Match(saveGame!.SaveGameName, pattern);
-
-        if (!match.Success)
-        {
-            throw new ArgumentException("Invalid game name");
-        }
-        return match.Groups[1].Value;
+        playerA = saveGame!.PlayerAName;
+        playerB = saveGame!.PlayerBName;
+        gameMode = saveGame.GameMode;
+        loadedGame = System.Text.Json.JsonSerializer.Deserialize<GameState>(saveGame!.SerializedJsonString)!;
     }
 }

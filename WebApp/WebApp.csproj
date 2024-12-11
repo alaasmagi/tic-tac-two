@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DAL\DAL.csproj" />
+      <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
         <PrivateAssets>all</PrivateAssets>
@@ -53,5 +54,25 @@
       <UpToDateCheckInput Remove="Pages\Configurations\Details.cshtml" />
       <UpToDateCheckInput Remove="Pages\Configurations\Edit.cshtml" />
       <UpToDateCheckInput Remove="Pages\Configurations\Index.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Users\Create.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Users\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Users\Details.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Users\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Users\Index.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Savegames\Create.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Savegames\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Savegames\Details.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Savegames\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Pages\Savegames\Index.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Create.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Details.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Index.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Create.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Details.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Pages\SaveGames\Index.cshtml" />
     </ItemGroup>
 </Project>

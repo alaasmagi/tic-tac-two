@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using GameBrain;
-
-namespace Domain;
+﻿namespace Domain;
 
 public class GameState
 { 

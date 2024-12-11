@@ -1,5 +1,4 @@
 using Domain;
-using GameBrain;
 
 namespace DAL;
 
@@ -21,19 +20,19 @@ public class ConfigRepositoryJson : IConfigRepository
 
     public GameConfig GetConfigurationByName(string name)
     {
-        var configJsonStr = System.IO.File.ReadAllText(FileHelper.BasePath + name + FileHelper.ConfigExtension);
+        var configJsonStr = File.ReadAllText(FileHelper.BasePath + name + FileHelper.ConfigExtension);
         var config = System.Text.Json.JsonSerializer.Deserialize<GameConfig>(configJsonStr);
         return config!;
     }
 
     private void CheckAndCreateInitialConfig()
     {
-        if (!System.IO.Directory.Exists(FileHelper.BasePath))
+        if (!Directory.Exists(FileHelper.BasePath))
         {
-            System.IO.Directory.CreateDirectory(FileHelper.BasePath);
+            Directory.CreateDirectory(FileHelper.BasePath);
         }
 
-        var data = System.IO.Directory.GetFiles(FileHelper.BasePath, "*" + FileHelper.ConfigExtension).ToList();
+        var data = Directory.GetFiles(FileHelper.BasePath, "*" + FileHelper.ConfigExtension).ToList();
         if (data.Count == 0)
         {
             var hardcodedRepo = new ConfigRepositoryHardcoded();
@@ -42,7 +41,7 @@ public class ConfigRepositoryJson : IConfigRepository
             {
                 var gameOption = hardcodedRepo.GetConfigurationByName(optionName);
                 var optionJsonStr = System.Text.Json.JsonSerializer.Serialize(gameOption);
-                System.IO.File.WriteAllText(FileHelper.BasePath + gameOption.Name + FileHelper.ConfigExtension, optionJsonStr);
+                File.WriteAllText(FileHelper.BasePath + gameOption.Name + FileHelper.ConfigExtension, optionJsonStr);
             }
         }
     }

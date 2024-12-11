@@ -2,18 +2,11 @@ using Domain;
 
 namespace DAL;
 
-public class ConfigRepositoryDb:IConfigRepository
+public class ConfigRepositoryDb(AppDbContext context) : IConfigRepository
 {
-    private readonly AppDbContext _context;
-    public ConfigRepositoryDb()
-    {
-        var contextFactory = new AppDbContextFactory();
-        _context = contextFactory.CreateDbContext([]);
-    }
-
     private void CheckAndCreateInitialConfig()
     {
-        if (!_context.Configurations.Any())
+        if (!context.Configurations.Any())
         {
             var hardcodedRepo = new ConfigRepositoryHardcoded();
             var optionNames = hardcodedRepo.GetConfigurationNames();
@@ -28,22 +21,22 @@ public class ConfigRepositoryDb:IConfigRepository
                     SerializedJsonString = System.Text.Json.JsonSerializer.Serialize(gameOption)
                 };
 
-                _context.Configurations.Add(config);
+                context.Configurations.Add(config);
             }
             
-            _context.SaveChanges();
+            context.SaveChanges();
         }
     }
 
     public List<string> GetConfigurationNames()
     {
         CheckAndCreateInitialConfig();
-        return _context.Configurations.Select(s => s.GameConfigName.ToString()).ToList();
+        return context.Configurations.Select(s => s.GameConfigName.ToString()).ToList();
     }
 
     public GameConfig GetConfigurationByName(string name)
     {
-        var gameConfig = _context.Configurations
+        var gameConfig = context.Configurations
             .FirstOrDefault(s => s.GameConfigName == name);
 
         GameConfig loadedConfig = System.Text.Json.JsonSerializer.Deserialize<GameConfig>(gameConfig!.SerializedJsonString)!;
@@ -59,12 +52,12 @@ public class ConfigRepositoryDb:IConfigRepository
             SerializedJsonString = gameConfig.ToJsonString()
         };
 
-        _context.Configurations.Add(config);
-        _context.SaveChanges();
+        context.Configurations.Add(config);
+        context.SaveChanges();
     }
 
     public bool DoesConfigExist(string name)
     {
-        return _context.Configurations.Any(s => s.GameConfigName == name);
+        return context.Configurations.Any(s => s.GameConfigName == name);
     }
 }

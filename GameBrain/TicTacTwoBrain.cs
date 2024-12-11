@@ -1,20 +1,27 @@
-﻿using System.Net;
-using Domain;
+﻿using Domain;
+using System.Threading;
+
 
 namespace GameBrain;
 
 public class TicTacTwoBrain
 {
     public GameState _gameState;
-    private int xPieceCount;
-    private int oPieceCount;
+    public EGameMode _gameMode;
+    public int xPieceCount;
+    public int oPieceCount;
+    public string playerAName;
+    public string playerBName;
     private int gamePieceCount;
 
     public int[] gameGridPos = { 0, 0 };
 
-    public TicTacTwoBrain(GameConfig gameConfiguration)
+    public TicTacTwoBrain(GameConfig gameConfiguration, EGameMode gameMode, string playerA, string playerB)
     {
+        playerAName = playerA;
+        playerBName = playerB;
         gamePieceCount = gameConfiguration.GamePiecesPerPlayer;
+        _gameMode = gameMode;
         EGameStatus currentStatus = EGameStatus.UnFinished;
         var gameBoard = new EGamePiece[gameConfiguration.BoardWidth][];
         for (int i = 0; i < gameBoard.Length; i++)
@@ -232,5 +239,25 @@ public class TicTacTwoBrain
         x = 0;
         y = 0;
         return false;
+    }
+    
+    public int[] GenerateAiMove()
+    {
+        Random random = new Random();
+        int[] generatedCoords = new int[2];
+        do
+        {
+            generatedCoords[0] = random.Next(0 , _gameState.GameConfiguration.BoardHeight - 1);
+            generatedCoords[1] = random.Next(0, _gameState.GameConfiguration.BoardHeight - 1);
+        } while (_gameState.GameBoard[generatedCoords[0]][generatedCoords[1]] != EGamePiece.Empty);
+        
+        Thread.Sleep(3 * 1000);
+        return generatedCoords;
+    }
+
+    public bool IsGridOrExistingMoveUnlocked()
+    {
+        return (xPieceCount + oPieceCount) >
+               _gameState.GameConfiguration.RelocatePiecesAfterMoves;
     }
 }

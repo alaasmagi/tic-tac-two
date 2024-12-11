@@ -1,4 +1,5 @@
-﻿using GameBrain;
+﻿using Domain;
+using GameBrain;
 
 namespace ConsoleUI;
 
@@ -12,7 +13,8 @@ public static class Visualizer
         {
             Console.Write($" {x}  ");
         }
-        Console.WriteLine("\n");
+        Console.WriteLine("");
+
         
         for (var y = 0; y < gameInstance.DimY; y++)
         {

@@ -1,34 +1,20 @@
+using DAL;
 using MenuSystem;
 
 namespace ConsoleApp;
 
 public static class Menus
 {
-    public static readonly Menu OptionsMenu =
-        new Menu(
-            EMenuLevel.Secondary,
-            "TIC-TAC-TWO Options", [
-                new MenuItem()
-                {
-                    Shortcut = "X",
-                    Title = "X Starts",
-                    MenuItemAction = DummyMethod
-                },
-                new MenuItem()
-                {
-                    Shortcut = "O",
-                    Title = "O Starts",
-                    MenuItemAction = DummyMethod
-                },
-                new MenuItem()
-                {
-                    Shortcut = "C",
-                    Title = "Configuration creation",
-                    MenuItemAction = OptionsController.MainLoop
-                }
-            ], listMenuFlag: false);
+    private static IConfigRepository _configRepository = default!;
+    private static IGameRepository _gameRepository = default!;
 
-    public static Menu MainMenu = new Menu(
+    public static void Init(IConfigRepository configRepository, IGameRepository gameRepository)
+    {
+        _configRepository = configRepository;
+        _gameRepository = gameRepository;
+    }
+    
+    public static readonly Menu MainMenu = new Menu(
         EMenuLevel.Main,
         "TIC-TAC-TWO", [
             
@@ -36,26 +22,19 @@ public static class Menus
             {
                 Shortcut = "L",
                 Title = "Load Game",
-                MenuItemAction = GameController.LoadExistingGameLoop
+                MenuItemAction = () => GameController.LoadExistingGameLoop(_configRepository, _gameRepository)
             },
             new MenuItem()
             {
                 Shortcut = "N",
                 Title = "New game",
-                MenuItemAction = GameController.StartNewGameLoop
+                MenuItemAction = () => GameController.StartNewGameLoop(_configRepository, _gameRepository)
             },
             new MenuItem()
             {
-                Shortcut = "O",
-                Title = "Options",
-                MenuItemAction = OptionsMenu.Run
+                Shortcut = "C",
+                Title = "Create configuration",
+                MenuItemAction = () => ConfigurationController.MainLoop(_configRepository)
             }
         ], listMenuFlag: false);
-
-    private static string DummyMethod()
-    {
-        Console.Write("Just press any key to get out from here! (Any key - as a random choice from keyboard....)");
-        Console.ReadKey();
-        return "foobar";
-    }
 }

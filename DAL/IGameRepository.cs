@@ -1,12 +1,10 @@
 using Domain;
-using GameBrain;
 
 namespace DAL;
 
 public interface IGameRepository
 {
-    public void SaveGame(string jsonStateString, string gameConfigName);
-    public List<string> GetSaveGameNames();
-    public GameState LoadGame(string name);
-    public string GetSaveConfigName(string gameName);
+    public void SaveGame(string jsonStateString, string gameConfigName, string playerA, string playerB, EGameMode gameMode);
+    public List<string> GetSaveGameNames(string playerName);
+    public void LoadGame(string name, out GameState loadedGame, out string playerA, out string playerB, out EGameMode gameMode);
 }
