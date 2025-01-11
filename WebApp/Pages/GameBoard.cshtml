@@ -1,0 +1,150 @@
+@page
+@using System.Drawing
+@using Domain
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.EntityFrameworkCore
+@model WebApp.Pages.GameBoard
+
+@{
+    ViewData["Title"] = "Board";
+}
+
+<link href="./css/gameboard-style.css" rel="stylesheet"/>
+
+<div class="text-center">
+    <h1>Game Board</h1>
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+    <div class="alert alert-secondary" role="alert">@Model.Message</div>
+    }
+    <table class="board-table">
+        <h4>@IsGameWon()</h4>
+        <h6>@IsYourTurn()</h6>
+        @if (Model.IsMovingGridOrPiecesUnlocked && string.IsNullOrEmpty(HttpContext.Session.GetString("MoveGrid")) &&
+             IsGameWon() == "" && DisableButtons() == "")
+        {
+            <form method="post" asp-page-handler="MoveGrid">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary">Move the grid</button>
+                </form>
+        }
+        @for (int j = 0; j < Model.CurrentState.GameConfiguration.BoardHeight; j++)
+        {
+            <tr>
+                @for (int i = 0; i < Model.CurrentState.GameConfiguration.BoardWidth; i++)
+                {
+                    <td>
+                        <form method="post" asp-page-handler="Select">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" name="GameButton" @DisableButtons() value="@i,@j" class="@GetCssStyling(i, j)">
+                                <b>@GetBoardOutput(i, j)</b>
+                            </button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+<div class="text-center" style="margin-top:20px">
+    @if (IsGameWon() != "")
+    {
+    <form method="post" asp-page-handler="Delete" style="display: inline;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="DeleteGameName" value="@Model.SaveGameName"/>
+        <button type="submit" class="btn btn-primary">Return to games' page</button>
+    </form>
+    }
+    else
+    {
+        <a asp-page="ShowGames">Return to main menu</a>
+        <p>[Progress is saved automatically]</p>
+    }
+</div>
+
+<script>
+    @if (IsGameWon() == "" && DisableButtons() != "")
+    {
+        <text>
+        setInterval(function () {
+            location.reload();
+        }, 3 * 1000);
+        </text>
+    }
+</script>
+
+@functions
+{
+    string GetCssStyling(int i, int j)
+    {
+        Point selectedButton = Model.GetCoordinatesFromString(HttpContext.Session.GetString("ButtonToMove")!);
+        
+        if (selectedButton != new Point(-1, -1) && i == selectedButton.X && j == selectedButton.Y && 
+            Model.CurrentState.GameBoard[i][j] == Model.CurrentState.NextMoveBy)
+        {
+            return "board-button-selected";
+        }
+
+        if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MoveGrid")) && Model.CurrentState.GameGrid[i][j] == EGameGrid.Grid)
+        {
+            return "moving-grid";
+        }
+        
+        return Model.CurrentState.GameGrid[i][j] == EGameGrid.Grid ? "board-button-grid" : "board-button-normal";
+    }
+
+    string GetBoardOutput(int i, int j)
+    {
+        return Model.CurrentState.GameBoard[i][j] switch
+        {
+            EGamePiece.X => "X",
+            EGamePiece.O => "O",
+            EGamePiece.Empty => "",
+            _ => ""
+        };
+    }
+
+    string DisableButtons()
+    {
+        if (((Model.CurrentState.NextMoveBy == EGamePiece.X && Model.PlayerA == Model.Username) ||
+            (Model.CurrentState.NextMoveBy == EGamePiece.O && Model.PlayerB == Model.Username)) && 
+            Model.CurrentState.CurrentStatus == EGameStatus.UnFinished)
+        {
+            return "";
+        }
+
+        return "disabled";
+    }
+
+    string IsYourTurn()
+    {
+        if (Model.CurrentState.CurrentStatus != EGameStatus.UnFinished)
+        {
+            return "";
+        }
+        
+        if (DisableButtons() != "")
+        {
+            return "Wait for opponent's move";
+        }
+
+        return "It's your turn!";
+    }
+
+    string IsGameWon()
+    {
+        switch (Model.CurrentState.CurrentStatus)
+        {
+            case EGameStatus.Tie:
+                return "It's a tie! Maybe next game will sort it out....";
+            case EGameStatus.XWins: 
+                return "X has won the game! Congrats!";
+            case EGameStatus.OWins:
+                return "O has won the game! Congrats!";
+            case EGameStatus.UnFinished:
+                return "";
+        }
+        return "";
+    }
+}
+

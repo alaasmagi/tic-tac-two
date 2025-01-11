@@ -1,8 +1,8 @@
 namespace Domain;
 
-public enum EGamePiece //it is actually int
+public enum EGamePiece
 {
-    Empty, //0
-    X, // 1
-    O, // 2
+    Empty,
+    X,
+    O,
 }

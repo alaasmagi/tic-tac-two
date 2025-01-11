@@ -55,8 +55,13 @@ public class ConfigRepositoryJson : IConfigRepository
         Console.WriteLine($"New game configuration created successfully: {gameConfig.Name}");
     }
 
-    public bool DoesConfigExist(string name)
+    public bool DoesConfigExist(string configName)
     {
-        return File.Exists(FileHelper.BasePath + name + FileHelper.ConfigExtension);
+        return File.Exists(FileHelper.BasePath + configName + FileHelper.ConfigExtension);
+    }
+
+    public void DeleteConfig(string configName)
+    {
+        File.Delete(FileHelper.BasePath + configName + FileHelper.ConfigExtension);
     }
 }

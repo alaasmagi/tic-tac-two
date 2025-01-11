@@ -21,9 +21,9 @@ public class ConfigRepositoryHardcoded: IConfigRepository
             .ToList();
     }
 
-    public GameConfig GetConfigurationByName(string name)
+    public GameConfig GetConfigurationByName(string configName)
     {
-        return _gameConfigurations.Single(c => c.Name == name);
+        return _gameConfigurations.Single(c => c.Name == configName);
     }
 
     public void CreateGameConfig(GameConfig gameConfig)
@@ -31,7 +31,12 @@ public class ConfigRepositoryHardcoded: IConfigRepository
         throw new NotImplementedException();
     }
 
-    public bool DoesConfigExist(string name)
+    public bool DoesConfigExist(string configName)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DeleteConfig(string configName)
     {
         throw new NotImplementedException();
     }

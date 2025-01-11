@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages;
 
-public class GamePlay : PageModel
+public class Rules : PageModel
 {
     public void OnGet()
     {

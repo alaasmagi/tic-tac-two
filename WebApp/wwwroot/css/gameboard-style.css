@@ -1,0 +1,52 @@
+.board-table {
+    margin: auto;
+    margin-top: 80px;
+}
+.board-table .board-table > tr,td {
+    border: 5px solid black; 
+    border-collapse: collapse;
+}
+
+.board-table > td {
+    text-align: center;
+}
+
+.board-button-normal {
+    background-color: transparent;
+    border: none;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+}
+
+.board-button-grid {
+    background-color: lightgreen;
+    border: none;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+}
+
+.board-button-selected{
+    background-color: yellow;
+    border: none;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+}
+
+.moving-grid {
+    background-color: steelblue;
+    border: none;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+}
+
+.board-button-normal:hover {
+    background-color: #ddd;
+}
+
+.board-button-grid:hover {
+    background-color: darkseagreen;
+}

@@ -1,0 +1,52 @@
+@page
+@model Rules
+@{
+    ViewData["Title"] = "Game rules";
+}
+<div class="">
+    <h1>Rules of Tic-Tac-Two</h1>
+
+    <h2>Objective</h2>
+    <p>
+        To win, align enough of your pieces in a row to span the active grid in any direction:
+    </p>
+    <ul>
+        <li><b>Horizontally</b></li>
+        <li><b>Vertically</b></li>
+        <li><b>Diagonally</b></li>
+    </ul>
+
+    <h2>Gameplay Overview</h2>
+    <p><b>Placing Pieces</b>: Similar to Tic-Tac-Toe, players place their pieces on the board.</p>
+    <p><b>Limited Pieces</b>: Each player has a fixed number of pieces.</p>
+    <p><b>Movable Grid</b>: The active grid can be repositioned during the game.</p>
+    <p><b>Move Existing Pieces</b>: Players can relocate their pieces to gain an advantage.</p>
+
+    <h2>Controls and Mechanics</h2>
+
+    <h3>Placing a Piece</h3>
+    <p>Click on an <b>empty space</b> on the board to place your piece.</p>
+
+    <h3>Moving the Grid</h3>
+    <ul>
+        <li>After passing enough turns, the option to move the grid becomes available.</li>
+        <li>Look for a button titled <b>"Move the Grid"</b> above the game board.</li>
+        <li>Click the button to activate grid movement mode. The grid will turn <b>blue</b>.</li>
+        <li>Click on a board space to set the <b>upper-left corner</b> of the new grid position.</li>
+    </ul>
+
+    <h3>Relocating an Existing Piece</h3>
+    <ul>
+        <li>After passing enough turns, the ability to move an existing piece becomes available alongside grid movement.</li>
+        <li>Click on one of your pieces to activate the move mode. The selected piece will turn <b>yellow</b>.</li>
+        <li>Click on an <b>empty space</b> to relocate your piece.</li>
+        <li class="note">Note: You cannot place your piece on a space already occupied by your opponent.</li>
+    </ul>
+
+    <h2>Additional Notes</h2>
+    <p><b>Turn Management</b>: Actions such as moving the grid or relocating pieces are unlocked by passing enough turns.</p>
+    <p><b>Strategic Flexibility</b>: Use the grid movement and piece relocation to gain an edge over your opponent!</p>
+
+    <p>Enjoy playing Tic-Tac-Two, and may the best strategist win! 🎮</p>
+
+</div>

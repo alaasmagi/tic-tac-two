@@ -7,28 +7,43 @@ public class GameRepositoryJson : IGameRepository
 {
     public List<string> GetSaveGameNames(string playerName)
     {
+
         return Directory
-            .GetFiles(FileHelper.BasePath, "*" + FileHelper.GameExtension)
-            .Select(fullFileName =>
+            .GetFiles(FileHelper.BasePath, "*" + FileHelper.GameExtension).Where(fullFileName => 
+                Path.GetFileNameWithoutExtension(fullFileName).Contains(playerName) || 
+                Path.GetFileNameWithoutExtension(fullFileName).Contains("AiVsAi")).Select(fullFileName =>
                 Path.GetFileNameWithoutExtension(
                     Path.GetFileNameWithoutExtension(fullFileName)
                 )
             )
             .ToList();
     }
-    public void SaveGame(string jsonStateString, string gameConfigName, string playerA, string playerB, EGameMode gameMode)
+    public void SaveGame(string saveGameName, string jsonStateString, string gameConfigName, string playerA, string playerB, EGameMode gameMode)
     {
-        var fileName = FileHelper.BasePath + $"{playerA}_{playerB}_{gameMode}_{gameConfigName}_" +
-                       DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss").Replace(":", "") +
-                       FileHelper.GameExtension;
+        if (string.IsNullOrEmpty(saveGameName))
+        {
+            saveGameName = GenerateSaveGameName(playerA, playerB, gameMode, gameConfigName);
+        }
+         
+        if (!saveGameName.EndsWith(FileHelper.GameExtension))
+        {
+            saveGameName += FileHelper.GameExtension;
+        }
         
-        File.WriteAllText(fileName, jsonStateString);
+        var filePath = Path.Combine(FileHelper.BasePath, saveGameName);
+        File.WriteAllText(filePath, jsonStateString);
+    }
+    
+    public bool DoesSaveGameExist(string saveGameName)
+    {
+        return File.Exists(FileHelper.BasePath + saveGameName + FileHelper.ConfigExtension);
     }
 
-    public void LoadGame(string name, out GameState loadedGame, out string playerA, out string playerB, out EGameMode gameMode)
+
+    public void LoadGame(string saveGameName, out GameState loadedGame, out string playerA, out string playerB, out EGameMode gameMode)
     {
         string pattern = @"^(?<playerA>[^_]+)_(?<playerB>[^_]+)_(?<gameMode>[^_]+)_.+";
-        var match = Regex.Match(name, pattern);
+        var match = Regex.Match(saveGameName, pattern);
 
         if (!match.Success)
         {
@@ -43,7 +58,19 @@ public class GameRepositoryJson : IGameRepository
             throw new ArgumentException("Invalid game mode in filename");
         }
         
-        var saveGameJsonString = File.ReadAllText(FileHelper.BasePath + name + FileHelper.GameExtension);
+        var saveGameJsonString = File.ReadAllText(FileHelper.BasePath + saveGameName + FileHelper.GameExtension);
         loadedGame = System.Text.Json.JsonSerializer.Deserialize<GameState>(saveGameJsonString)!;
+    }
+
+    public void DeleteGame(string saveGameName)
+    {
+        File.Delete(FileHelper.BasePath + saveGameName + FileHelper.GameExtension);
+    }
+
+    public string GenerateSaveGameName(string playerA, string playerB, EGameMode gameMode, string gameConfigName)
+    {
+        return $"{playerA}_{playerB}_{gameMode}_{gameConfigName}_" +
+               DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss").Replace(":", "");
+
     }
 }

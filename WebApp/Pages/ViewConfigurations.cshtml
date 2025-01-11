@@ -1,35 +1,37 @@
 @page
-@model WebApp.Pages.ShowGames
+@model WebApp.Pages.ViewConfigurations
 
 @{
     ViewData["Title"] = "Menu";
 }
 
 <div class="text-center">
-    <h3>@Model.Username's games</h3>
+    <h3>Manage configurations</h3>
     @if (!string.IsNullOrEmpty(Model.Message))
     {
         <div class="alert alert-success" role="alert">@Model.Message</div>
     }
 
     <table class="table">
+        <thead>
+        <tr>
+            <th>
+                Game name
+            </th>
+            <th></th>
+        </tr>
+        </thead>
         <tbody>
-        @foreach (var item in Model.SaveGames)
+        @foreach (var item in Model.Configurations)
         {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item)
                 </td>
                 <td>
-                    <form method="post" asp-page-handler="Select" style="display: inline;">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="SelectedGameName" value="@item"/>
-                        <input type="hidden" name="User" value="@Model.Username"/>
-                        <button type="submit" class="btn btn-primary">Select</button>
-                    </form>
                     <form method="post" asp-page-handler="Delete" style="display: inline;">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="DeleteGameName" value="@item"/>
+                        <input type="hidden" name="DeleteConfiguration" value="@item"/>
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </td>
@@ -38,7 +40,5 @@
         </tbody>
     </table>
     <a asp-page="./Index">Back to Login</a> |
-    <a asp-page="./ViewConfigurations">Manage configurations</a> |
-    <a asp-page="./CreateSaveGame">New game</a> |
     <a asp-page="./CreateConfig">New configuration</a>
 </div>

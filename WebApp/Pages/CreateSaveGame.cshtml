@@ -1,0 +1,92 @@
+@page
+@using Domain
+@using Microsoft.EntityFrameworkCore
+@model WebApp.Pages.CreateSaveGame
+
+@{
+    ViewData["Title"] = "CreateSaveGame";
+}
+
+<div class="text-center">
+    <h3>New game</h3>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-danger" role="alert">@Model.Message</div>
+    }
+    <form method="post" asp-page-handler="Create">
+        <div class="d-flex justify-content-center">
+            <div>
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label for="GameModeInput">Select game mode:</label>
+                    <select name="GameModeInput" id="GameModeInput" required>
+                        <option value="0" selected>Player vs Computer</option>
+                        <option value="1">Player vs Player</option>
+                        <option value="2">Computer vs Computer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="PlayerA">Player A name:</label>
+                    <input type="text" id="PlayerA" name="PlayerA" class="form-control" value="@Model.Username" readonly="" required/>
+                </div>
+                <div class="form-group">
+                    <label for="PlayerB">Enter Player B name:</label>
+                    <input type="text" id="PlayerB" name="PlayerB" class="form-control" placeholder="eg. coolusername123" required/>
+                </div>
+                <div class="form-group">
+                    <label for="Configuration">Select gameplay configuration:</label>
+                    <select name="Configuration" id="Configuration" required>
+                        @foreach (var configuration in Model.ConfigurationNames)
+                        {
+                            <option value="@configuration">@configuration</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Create new game</button>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <a asp-page="./Index">Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const gameMode = document.getElementById('GameModeInput');
+        const playerA = document.getElementById('PlayerA');
+        const playerB = document.getElementById('PlayerB');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function updateForm() {
+            switch (gameMode.value) {
+                case "2":
+                    playerA.value = "AI";
+                    playerB.value = "AI";
+                    playerB.readOnly = true;
+                    break;
+                case "0":
+                    playerA.value = "@Model.Username";
+                    playerB.value = "AI";
+                    playerB.readOnly = true;
+                    break;
+                case "1":
+                    playerA.value = "@Model.Username";
+                    playerB.value = "";
+                    playerB.readOnly = false;
+                    break;
+                default:
+                    submitBtn.disabled = true;
+                    return;
+            }
+            submitBtn.disabled = false;
+        }
+        
+        updateForm();
+        gameMode.addEventListener('change', updateForm);
+    });
+</script>

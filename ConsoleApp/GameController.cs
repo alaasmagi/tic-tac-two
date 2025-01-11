@@ -1,3 +1,4 @@
+using System.Drawing;
 using DAL;
 using Domain;
 using GameBrain;
@@ -33,7 +34,8 @@ public static class GameController
         
         var gameInstance = new TicTacTwoBrain(chosenConfig, gameMode, playerA, playerB);
 
-        gameInstance.MoveTheGrid(chosenConfig.GridStartPosX, chosenConfig.GridStartPosY);
+        gameInstance.MoveTheGrid(new Point(chosenConfig.GridStartPosX, chosenConfig.GridStartPosY));
+        gameInstance.saveGameName = string.Empty;
         
         return GameplayLoop(gameInstance, string.Empty);
     }
@@ -56,6 +58,7 @@ public static class GameController
             out GameState chosenSaveGame, out string playerA, out string playerB, out EGameMode gameMode);
         var gameInstance = new TicTacTwoBrain(chosenSaveGame.GameConfiguration, gameMode, playerA, playerB);
         gameInstance._gameState = chosenSaveGame;
+        gameInstance.saveGameName = _gameRepository.GetSaveGameNames(playerName)[saveGameOption];
         
         return GameplayLoop(gameInstance, string.Empty);
     }
@@ -67,8 +70,18 @@ public static class GameController
         WriteMessages(gameInstance._gameState.NextMoveBy == EGamePiece.X ? $"X's turn ({gameInstance.playerAName})" : 
             $"O's turn ({gameInstance.playerBName})", "TURN");
         CheckForWin(gameInstance);
-        ShowMenu(gameInstance);
         
+        if ((gameInstance._gameMode == EGameMode.PlayerVsAi && gameInstance._gameState.NextMoveBy == EGamePiece.O) ||
+            gameInstance._gameMode == EGameMode.AiVsAi)
+        {
+            Thread.Sleep(2 * 1000);
+            AiMove(gameInstance);
+        }
+        else
+        {
+            ShowMenu(gameInstance);
+        }
+
         return string.Empty;
     }
 
@@ -145,7 +158,7 @@ public static class GameController
                     Title = "Player versus Player",
                     MenuItemAction = () =>
                     {
-                        chosenGameMode = EGameMode.PlayerVsAi;
+                        chosenGameMode = EGameMode.PlayerVsPlayer;
                         return string.Empty;
                     },
                     Shortcut = "P"
@@ -168,9 +181,9 @@ public static class GameController
     }
     
 
-    private static int[] AskCoordinates()
+    private static Point AskCoordinates()
     {
-        int[] output;
+        Point output;
         string input;
         do
         {
@@ -187,19 +200,9 @@ public static class GameController
 
     private static void MakeMove(TicTacTwoBrain gameInstance)
     {
-        int[] coords = new int[2];
-        if ((gameInstance._gameMode == EGameMode.PlayerVsAi && gameInstance._gameState.NextMoveBy == EGamePiece.O) ||
-            gameInstance._gameMode == EGameMode.AiVsAi)
-        {
-            coords = gameInstance.GenerateAiMove();
-        }
-        else
-        {
-            coords = AskCoordinates();
-        }
-         
-
-        if (!gameInstance.MakeAMove(coords[0], coords[1]))
+        var coords = AskCoordinates();
+        
+        if (!gameInstance.PlaceAPiece(coords))
         {
             GameplayLoop(gameInstance, "Invalid coordinates");
         }
@@ -209,9 +212,9 @@ public static class GameController
 
     private static void MoveGrid(TicTacTwoBrain gameInstance)
     {
-        int[] coords = AskCoordinates();
+        Point coordinates = AskCoordinates();
 
-        if (!gameInstance.MoveTheGrid(coords[0], coords[1]))
+        if (!gameInstance.MoveTheGrid(coordinates))
         {
             GameplayLoop(gameInstance, "Invalid coordinates!");
         }
@@ -222,11 +225,11 @@ public static class GameController
     private static void MoveExistingPiece(TicTacTwoBrain gameInstance)
     {
         Console.WriteLine("Coordinates of button You want to move:");
-        int[] previouscoords = AskCoordinates();
+        Point previousCoords = AskCoordinates();
         Console.WriteLine("Where do You want to move it?");
-        int[] coords = AskCoordinates();
+        Point coordinates = AskCoordinates();
         
-        if (!gameInstance.MoveExistingPiece(coords[0], coords[1], previouscoords[0], previouscoords[1]))
+        if (!gameInstance.MoveExistingPiece(coordinates, previousCoords))
         {
             GameplayLoop(gameInstance, "Invalid coordinates");
         }
@@ -242,26 +245,17 @@ public static class GameController
     private static void ShowMenu(TicTacTwoBrain gameInstance)
     {
         List<MenuItem> actions = new List<MenuItem>();
-
-        if ((gameInstance._gameMode == EGameMode.PlayerVsAi && gameInstance._gameState.NextMoveBy == EGamePiece.O) ||
-            gameInstance._gameMode == EGameMode.AiVsAi)
-        {
-            MakeMove(gameInstance);
-        }
-        else
-        {
-            actions.Add(new MenuItem()
-            {
-                Shortcut = "B",
-                Title = "Place a button",
-                MenuItemAction = () =>
-                {
-                    MakeMove(gameInstance);
-                    return string.Empty;
-                },
-            });
-        }
         
+        actions.Add(new MenuItem()
+        {
+            Shortcut = "B",
+            Title = "Place a button",
+            MenuItemAction = () =>
+            {
+                MakeMove(gameInstance);
+                return string.Empty;
+            },
+        });
         actions.Add(new MenuItem()
         {
             Shortcut = "S",
@@ -269,13 +263,14 @@ public static class GameController
             MenuItemAction = () =>
             {
                 _gameRepository.SaveGame(
+                    gameInstance.saveGameName,
                     gameInstance.GetGameStateJson(),
                     gameInstance.GetGameConfigName(),
                     gameInstance.playerAName,
                     gameInstance.playerBName,
                     gameInstance._gameMode
                 );
-                return String.Empty;
+                return string.Empty;
             }
         });
         actions.Add(new MenuItem()
@@ -319,41 +314,42 @@ public static class GameController
         actionMenu.Run();
     }
     
-    private static bool ValidateCoordinates(string input, out int[] coordinates)
+    private static bool ValidateCoordinates(string input, out Point coordinates)
     {
-        coordinates = new int[2];
+        coordinates = new Point();
         if (input.Length != 3 || !input.Contains(','))
         {
             return false;
         }
         var inputSplit = input.Split(",");
-        return int.TryParse(inputSplit[0].Trim(), out coordinates[0]) &&
-               int.TryParse(inputSplit[1].Trim(), out coordinates[1]);
-    }
+        if (int.TryParse(inputSplit[0].Trim(), out int x) &&
+            int.TryParse(inputSplit[1].Trim(), out int y))
+        {
+            coordinates = new Point(x, y);
+            return true;
+        }
 
+        return false;
+    }
+    
     private static void CheckForWin(TicTacTwoBrain gameInstance)
     {
-        gameInstance.FindGridCoordinates(gameInstance, out int gridPosX, out int gridPosY);
-        GameWinChecker.CheckForWin(gridPosX, gridPosY, gameInstance._gameState);
         switch (gameInstance._gameState.CurrentStatus)
         {
             case EGameStatus.XWins:
                 HandleGameEnd("X won the game! Congrats!");
+                _gameRepository.DeleteGame(gameInstance.saveGameName);
                 break;
             case EGameStatus.OWins:
                 HandleGameEnd("O won the game! Congrats!");
+                _gameRepository.DeleteGame(gameInstance.saveGameName);
                 break;
             case EGameStatus.Tie:
                 HandleGameEnd("It's a tie! Maybe a new game will sort it out!");
+                _gameRepository.DeleteGame(gameInstance.saveGameName);
                 break;
             case EGameStatus.UnFinished:
                 break;
-        }
-        
-        if ((gameInstance._gameMode == EGameMode.AiVsAi || gameInstance._gameMode == EGameMode.PlayerVsAi) &&
-            gameInstance.oPieceCount >= gameInstance._gameState.GameConfiguration.GamePiecesPerPlayer)
-        {
-            HandleGameEnd("It's a tie! Maybe a new game will sort it out!");
         }
     }
     
@@ -406,7 +402,7 @@ public static class GameController
 
     private static string AskForPlayerName(string player)
     {
-        string playerName = string.Empty;
+        string playerName;
         do
         {
             WriteMessages($"Please enter {player}'s name: ", "ACTION");
@@ -415,7 +411,13 @@ public static class GameController
         
         playerName = playerName.Trim();
         
-        return playerName ?? "";
+        return playerName;
+    }
+
+    private static void AiMove(TicTacTwoBrain gameInstance)
+    {
+        AiBrain.AiMove(gameInstance);
+        GameplayLoop(gameInstance, string.Empty);
     }
     
 }

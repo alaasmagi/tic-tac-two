@@ -20,22 +20,22 @@ public static class ConfigurationController
         addConfig.BoardHeight = GetInputInt("Board Height", addConfig.BoardHeight, MinInput, MaxInput);
         
         addConfig.BoardWidth = GetInputInt("Board Width", addConfig.BoardWidth, MinInput, MaxInput);
+       
+        addConfig.GridSizeAndWinCondition = GetInputInt("Grid size and win condition", 
+                                                addConfig.GridSizeAndWinCondition, MinInput, addConfig.BoardHeight);
         
         addConfig.GridStartPosX = GetInputInt("Grid start position x coordinate", addConfig.GridStartPosX,
-                                                                                    0, addConfig.BoardWidth);
+                                                0, addConfig.BoardWidth - addConfig.GridSizeAndWinCondition);
         
         addConfig.GridStartPosY = GetInputInt("Grid start position y coordinate", addConfig.GridStartPosY,
-                                                                                    0, addConfig.BoardHeight);
-        
-        addConfig.GridSizeAndWinCondition = GetInputInt("Grid size and win condition", 
-                                                addConfig.GridSizeAndWinCondition, MinInput, MaxInput);
+                                                0, addConfig.BoardHeight - addConfig.GridSizeAndWinCondition);
         
         addConfig.GamePiecesPerPlayer = GetInputInt("Number of game pieces per player", addConfig.GamePiecesPerPlayer,
                                                 addConfig.GridSizeAndWinCondition, addConfig.BoardHeight * 
                                                     addConfig.BoardWidth / 2 + addConfig.GridSizeAndWinCondition);
         
-        addConfig.RelocatePiecesAfterMoves = GetInputInt("Ability to move pieces after n moves (0 to disable)", 
-                                                0, MinInput, MaxInput);
+        addConfig.RelocatePiecesAfterMoves = GetInputInt("Ability to move pieces and grid after n moves (0 to disable)", 
+                                                addConfig.RelocatePiecesAfterMoves, 0, 2 * addConfig.GamePiecesPerPlayer);
         
         _configRepository.CreateGameConfig(addConfig);
         return "";

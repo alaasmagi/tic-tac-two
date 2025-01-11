@@ -1,26 +1,27 @@
+using System.Drawing;
 using Domain;
 
 namespace GameBrain;
 
 public class GameWinChecker
 {
-    public static void CheckForWin(int gridPosX, int gridPosY, GameState gameState)
+    public static void CheckForWin(Point gridCoordinates, GameState gameState)
      {
          var winCondition = gameState.GameConfiguration.GridSizeAndWinCondition;
          
-         CheckRows(gridPosX, gridPosY, gameState, winCondition);
+         CheckRows(gridCoordinates.X, gridCoordinates.Y, gameState, winCondition);
          if (gameState.CurrentStatus is EGameStatus.Tie or EGameStatus.OWins or EGameStatus.XWins)
          {
              return;
          }
          
-         CheckColumns(gridPosX, gridPosY, gameState, winCondition);
+         CheckColumns(gridCoordinates.X, gridCoordinates.Y, gameState, winCondition);
          if (gameState.CurrentStatus is EGameStatus.Tie or EGameStatus.OWins or EGameStatus.XWins)
          {
              return;
          }
          
-         CheckDiagonals(gridPosX, gridPosY, gameState, winCondition);
+         CheckDiagonals(gridCoordinates.X, gridCoordinates.Y, gameState, winCondition);
      }
      private static void CheckRows(int x, int y, GameState gameState, int winCon)
      {

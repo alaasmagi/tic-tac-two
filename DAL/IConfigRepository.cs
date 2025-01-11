@@ -5,7 +5,8 @@ namespace DAL;
 public interface IConfigRepository
 {
     List<string> GetConfigurationNames();
-    GameConfig GetConfigurationByName(string name);
+    GameConfig GetConfigurationByName(string configName);
     void CreateGameConfig(GameConfig gameConfig);
-    bool DoesConfigExist(string name);
+    bool DoesConfigExist(string configName);
+    void DeleteConfig(string configName);
 }

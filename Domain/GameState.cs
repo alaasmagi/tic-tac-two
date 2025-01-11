@@ -1,4 +1,6 @@
-﻿namespace Domain;
+﻿using System.Drawing;
+
+namespace Domain;
 
 public class GameState
 { 
@@ -11,14 +13,15 @@ public class GameState
     public int XPiecesCount { get; set; }
     public int OPiecesCount { get; set; }
 
-    public GameState(EGamePiece[][] gameBoard, EGameGrid[][] gameGrid, GameConfig gameConfiguration, EGameStatus currentStatus, int xPiecesCount, int oPiecesCount)
+    public List<Point> AiPlacedXPieces { get; set; } = new();
+    public List<Point> AiPlacedOPieces { get; set; } = new();
+
+    public GameState(EGamePiece[][] gameBoard, EGameGrid[][] gameGrid, GameConfig gameConfiguration, EGameStatus currentStatus)
     {
         GameBoard = gameBoard;
         GameGrid = gameGrid;
         GameConfiguration = gameConfiguration;
         CurrentStatus = currentStatus;
-        XPiecesCount = xPiecesCount;
-        OPiecesCount = oPiecesCount;
     }
 
     public string ToJsonString()

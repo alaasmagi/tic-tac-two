@@ -8,20 +8,13 @@ var connectionString = $"Data Source={FileHelper.BasePath}app.db";
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 
-//builder.Services
-//.AddTransient<>(); - create new one every time
-//.AddSingleton<>(); - create new one on first try, all the next requests get existing
-//.AddScoped<>(); - create new one for every web request
-
 //builder.Services.AddScoped<IConfigRepository, ConfigRepositoryJson>();
 builder.Services.AddScoped<IConfigRepository, ConfigRepositoryDb>();
+//builder.Services.AddScoped<IGameRepository, GameRepositoryJson>();
 builder.Services.AddScoped<IGameRepository, GameRepositoryDb>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-
-
-
+builder.Services.AddSession();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -37,6 +30,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapStaticAssets();
+
+app.UseSession();
 
 app.UseRouting();
 

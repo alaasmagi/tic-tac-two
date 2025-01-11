@@ -1,0 +1,118 @@
+@page
+@model WebApp.Pages.CreateConfig
+
+@{
+ViewData["Title"] = "Create Configuration";
+}
+
+<div class="text-center">
+    <h3>New configuration</h3>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+    <div class="alert alert-danger" role="alert">@Model.Message</div>
+    }
+    <form method="post" asp-page-handler="Create">
+        <div class="row" >
+            <div class="col-md-6">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label for="ConfigurationName">Enter configuration name:</label>
+                    <input type="text" id="ConfigurationName" name="ConfigurationName" class="form-control" placeholder="eg. Big board" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="BoardHeight" class="form-label">Select board height:</label>
+                    <b id="BoardHeightValue">@Model.AddConfig.BoardHeight</b>
+                    <input type="range" class="form-range" id="BoardHeight" name="BoardHeight" min="3" max="25"
+                           value="@Model.AddConfig.BoardHeight"
+                           oninput="document.getElementById('BoardHeightValue').textContent = this.value;
+                    document.getElementById('GridSizeWinCondition').max = this.value;
+                    document.getElementById('YCoords').max = this.value - document.getElementById('GridSizeWinCondition').value;" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="BoardWidth" class="form-label">Select board width:</label>
+                    <b id="BoardWidthValue">@Model.AddConfig.BoardWidth</b>
+                    <input type="range" class="form-range" id="BoardWidth" name="BoardWidth" min="3" max="25"
+                           value="@Model.AddConfig.BoardWidth"
+                           oninput="document.getElementById('BoardWidthValue').textContent = this.value;
+                    document.getElementById('GridSizeWinCondition').max = this.value;
+                    document.getElementById('XCoords').max = this.value - document.getElementById('GridSizeWinCondition').value;" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="GridSizeWinCondition" class="form-label">Select grid size and win condition:</label>
+                    <b id="GridSizeWinConditionValue">@Model.AddConfig.GridSizeAndWinCondition</b>
+                    <input type="range" class="form-range" id="GridSizeWinCondition" name="GridSizeWinCondition" min="3"
+                           value="@Model.AddConfig.GridSizeAndWinCondition"
+                           oninput="document.getElementById('GridSizeWinConditionValue').textContent = this.value;
+                    document.getElementById('NrOfGamePieces').max = this.value + 2;
+                    document.getElementById('XCoords').max = document.getElementById('BoardWidth').value - this.value;
+                    document.getElementById('YCoords').max = document.getElementById('BoardHeight').value - this.value;
+                    document.getElementById('NrOfGamePieces').min = this.value;
+                    document.getElementById('NrOfGamePieces').max = document.getElementById('BoardHeight').value * 
+                    document.getElementById('BoardWidth').value / 2 + this.value;" required />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="XCoords">Grid start position [x] coordinate:</label>
+                    <input type="number" id="XCoords" name="XCoords" class="form-control" min="0" value="@Model.AddConfig.GridStartPosX" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="YCoords">Grid start position [y] coordinate:</label>
+                    <input type="number" id="YCoords" name="YCoords" class="form-control" min="0" value="@Model.AddConfig.GridStartPosY" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="NrOfGamePieces">Enter number of game pieces per player:</label>
+                    <input type="number" id="NrOfGamePieces" name="NrOfGamePieces" class="form-control"
+                           oninput="document.getElementById('MovePiecesAfterNMoves').max = 2 * this.value;"
+                           value="@Model.AddConfig.GamePiecesPerPlayer" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="MovePiecesAfterNMoves" class="form-label">Move pieces and grid after n moves (0 to disable):</label>
+                    <input type="number" id="MovePiecesAfterNMoves" name="MovePiecesAfterNMoves" class="form-control" min="0"
+                           value="@Model.AddConfig.RelocatePiecesAfterMoves" required />
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <button type="submit" class="btn btn-primary">Create new configuration</button>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <a asp-page="./Index">Back to Login</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    addEventListener('DOMContentLoaded', () => {
+        document.getElementById('BoardHeight').min = document.getElementById('BoardWidth').min = 
+        document.getElementById('GridSizeWinCondition').min = 3;
+        
+        document.getElementById('XCoords').min = document.getElementById('YCoords').min = 
+        document.getElementById('MovePiecesAfterNMoves').min = 0;
+        
+        document.getElementById('BoardHeight').max = document.getElementById('BoardWidth').max = 25;
+        
+        document.getElementById('GridSizeWinCondition').max = document.getElementById('BoardHeight').value;
+        
+        document.getElementById('XCoords').max = document.getElementById('BoardWidth').value - 
+        document.getElementById('GridSizeWinCondition').value;
+        
+        document.getElementById('YCoords').max = document.getElementById('BoardHeight').value -
+        document.getElementById('GridSizeWinCondition').value;
+        
+        document.getElementById('NrOfGamePieces').min = document.getElementById('GridSizeWinCondition').value;
+        
+        document.getElementById('NrOfGamePieces').max = document.getElementById('BoardHeight').value *
+        document.getElementById('BoardWidth').value / 2 + document.getElementById('GridSizeWinCondition').value;
+        
+        document.getElementById('MovePiecesAfterNMoves').max = 2 * document.getElementById('NrOfGamePieces').value;        
+    });
+</script>

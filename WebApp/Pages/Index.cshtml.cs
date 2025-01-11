@@ -1,4 +1,3 @@
-using DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -6,15 +5,8 @@ namespace WebApp.Pages;
 
 public class IndexModel : PageModel
 {
-    private readonly ILogger<IndexModel> _logger;
-    
     [BindProperty]
     public string Username { get; set; } = default!;
-
-    public IndexModel(ILogger<IndexModel> logger)
-    {
-        _logger = logger;
-    }
 
     public void OnGet()
     {
@@ -22,8 +14,12 @@ public class IndexModel : PageModel
 
     public IActionResult OnPost()
     {
-        if (string.IsNullOrEmpty(Username)) return Page();
-        TempData["Username"] = Username;
-        return RedirectToPage("ShowGames");
+        if (string.IsNullOrEmpty(Username))
+        { 
+            return Page();
+        }
+        
+        HttpContext.Session.SetString("Username", Username);
+        return RedirectToPage("ShowGames", new { message = string.Empty });
     }
 }

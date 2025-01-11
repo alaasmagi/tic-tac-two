@@ -9,7 +9,7 @@ connectionString = connectionString.Replace("<%location%>", FileHelper.BasePath)
 optionsBuilder.UseSqlite(connectionString);
 
 using var db = new AppDbContext(optionsBuilder.Options);
-
+    
 var configRepository = new ConfigRepositoryDb(db);
 //var configRepository = new ConfigRepositoryJson();
 var gameRepository = new GameRepositoryDb(db);

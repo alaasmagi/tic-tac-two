@@ -34,10 +34,10 @@ public class ConfigRepositoryDb(AppDbContext context) : IConfigRepository
         return context.Configurations.Select(s => s.GameConfigName.ToString()).ToList();
     }
 
-    public GameConfig GetConfigurationByName(string name)
+    public GameConfig GetConfigurationByName(string configName)
     {
         var gameConfig = context.Configurations
-            .FirstOrDefault(s => s.GameConfigName == name);
+            .FirstOrDefault(s => s.GameConfigName == configName);
 
         GameConfig loadedConfig = System.Text.Json.JsonSerializer.Deserialize<GameConfig>(gameConfig!.SerializedJsonString)!;
 
@@ -56,8 +56,19 @@ public class ConfigRepositoryDb(AppDbContext context) : IConfigRepository
         context.SaveChanges();
     }
 
-    public bool DoesConfigExist(string name)
+    public bool DoesConfigExist(string configName)
     {
-        return context.Configurations.Any(s => s.GameConfigName == name);
+        return context.Configurations.Any(s => s.GameConfigName == configName);
+    }
+    
+    public void DeleteConfig(string configName)
+    {
+        var entityToDelete = context.Configurations.FirstOrDefault(s => s.GameConfigName == configName); 
+        
+        if (entityToDelete != null)
+        {
+            context.Configurations.Remove(entityToDelete);
+            context.SaveChanges();
+        }
     }
 }
