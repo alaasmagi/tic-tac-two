@@ -161,7 +161,7 @@ In both approaches, configuration and gamestate data is stored as serialized JSO
 ## Scaling possibilities
 
 ### Mobile Application
-* Create a dedicated iOS/Android application containing the web Ui, while the backend runs on a separate server.
+* Create a dedicated iOS/Android application containing the web UI, while the backend runs on a separate server.
 
 ### Cloud Integration
 * Host the backend on platforms like AWS, Azure, or GCP for scalability and reliability.
