@@ -166,3 +166,13 @@ In both approaches, configuration and gamestate data is stored as serialized JSO
 ### Cloud Integration
 * Host the backend on platforms like AWS, Azure, or GCP for scalability and reliability.
 * Store the SQLite database in a cloud-hosted database service such as AWS RDS or Azure SQL Database.
+
+## Illustrative images
+### Console UI (gameboard):
+![Screenshot 2025-01-11 131715](https://github.com/user-attachments/assets/6f876e79-1432-4158-87e9-b731acc44618)
+### Web UI (gameboard):
+![Screenshot 2025-01-11 131948](https://github.com/user-attachments/assets/2da6a125-d13e-4a65-a746-49d6112ee2a8)
+### Web UI (game rules):
+![Screenshot 2025-01-11 131851](https://github.com/user-attachments/assets/4970cb3a-94c7-4439-bcfb-8057b37077d2)
+
+
